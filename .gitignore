@@ -1,0 +1,24 @@
+__pycache__/
+*.pyc
+*.pkl
+*.index
+*.log
+*.db
+*.cache/
+
+# Dossiers à ne pas versionner
+data/
+outputs/
+classifiers/results_classifier/
+
+# Configs perso
+.env
+*.env
+
+# IDE
+.vscode/
+.idea/
+
+# Système
+.DS_Store
+Thumbs.db

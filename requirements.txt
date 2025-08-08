@@ -1,0 +1,20 @@
+# Core PDF extraction
+pdfplumber==0.10.2
+PyMuPDF==1.23.22
+Pillow==10.2.0
+
+# Embedding & RAG
+transformers==4.40.0
+sentence-transformers==2.7.0
+scikit-learn==1.4.1.post1
+torch==2.3.0
+
+# Optionnel : FAISS (si version avec faiss utilisée dans qwen_embedding_101.py)
+#faiss-cpu==1.7.4  # uniquement si FAISS est activé
+
+# Interface utilisateur
+gradio==4.31.3
+streamlit==1.28.0
+
+# Utilitaires
+numpy==1.26.4
