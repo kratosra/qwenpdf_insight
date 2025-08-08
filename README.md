@@ -59,6 +59,10 @@ py .\scripts\launch_gradio_img.py
    * Génère une réponse avec Qwen3
 4.  Réponse générée en langage naturel
 
+## 🖼️ Schéma du pipeline
+
+![Pipeline RAG Multimodal](docs/pipeline_rag_better.png)
+
 ---
 
 ##  Dépendances clés
