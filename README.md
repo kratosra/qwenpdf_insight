@@ -61,7 +61,7 @@ py .\scripts\launch_gradio_img.py
 
 ## 🖼️ Schéma du pipeline
 
-![Pipeline RAG Multimodal](docs/pipeline_rag_better.png)
+![Pipeline RAG Multimodal](docs/pipeline_rag_vertical.png)
 
 ---
 
