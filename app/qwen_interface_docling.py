@@ -3,7 +3,7 @@ from pathlib import Path
 import gradio as gr
 
 from pipeline.cache_manager import EmbeddingCacheManager
-from pipeline.extract.extract_with_docling_img import pdf_to_markdown, chunk_markdown
+from pipeline.extract.extract_with_docling import pdf_to_markdown, chunk_markdown
 from pipeline.embedding.qwen_embedding import embed_chunks_qwen3, build_faiss_index, retrieve_top_k_chunks
 from pipeline.generation.generate_qwen_answer import generate_answer_qwen_chat_format
 
@@ -18,7 +18,7 @@ LOG_FILE     = PROJECT_ROOT / "logs" / "interface_log.txt"
 for d in (UPLOAD_DIR, MD_DIR, CHUNK_DIR, LOG_FILE.parent):
     d.mkdir(parents=True, exist_ok=True)
 
-cache_manager = EmbeddingCacheManager(cache_dir="data/cache_img")
+cache_manager = EmbeddingCacheManager(cache_dir="data/cache")
 
 def pipeline_question_answer(pdf_file, user_question, top_k=3):
     if pdf_file is None or not user_question.strip():
