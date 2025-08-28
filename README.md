@@ -24,7 +24,7 @@ Il combine **Docling** (extraction), **Qwen3** (embeddings + génération), **CL
 
 ## 🧱 Architecture (vue fonctionnelle)
 
-![Architecture du pipeline](docs/Capture d'écran 2025-08-28 174856.png)
+![Architecture du pipeline](docs/pipeline.png)
 
 ## 🗂️ Graphe de structure du projet
 
