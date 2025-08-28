@@ -1,0 +1,10 @@
+{"qid": "q001", "doc_id": "DocFinancier", "question": "Quel est le CA total à fin novembre 2024 (tous réseaux confondus) ?", "answer_gold": "4 830 MMAD"}
+{"qid": "q002", "doc_id": "DocFinancier", "question": "Quel est le CA total à fin novembre 2023 (tous réseaux confondus) ?", "answer_gold": "4 586 MMAD"}
+{"qid": "q003", "doc_id": "DocFinancier", "question": "Quelle est la variation du CA de la branche Vie entre fin novembre 2023 et fin novembre 2024 ?", "answer_gold": "+152 MMAD (16,5%)"}
+{"qid": "q004", "doc_id": "DocFinancier", "question": "Quelle est la variation du CA de la branche Incendie & Multirisques entre fin novembre 2023 et fin novembre 2024 ?", "answer_gold": "+61 MMAD (23,3%)"}
+{"qid": "q005", "doc_id": "DocFinancier", "question": "Quel est le CA Auto Mono à fin novembre 2024 (tous réseaux confondus) ?", "answer_gold": "1 367 MMAD"}
+{"qid": "q006", "doc_id": "DocFinancier", "question": "Quel est le CA Auto Flotte à fin novembre 2024 (tous réseaux confondus) ?", "answer_gold": "239 MMAD"}
+{"qid": "q007", "doc_id": "DocFinancier", "question": "Quel est le TRO versus budget en Auto global à fin novembre 2024 ?", "answer_gold": "90%"}
+{"qid": "q008", "doc_id": "DocFinancier", "question": "Quelle est la croissance du réseau exclusif à fin novembre 2024 (en MMAD et en %) ?", "answer_gold": "+144 MMAD (8,7%)"}
+{"qid": "q009", "doc_id": "DocFinancier", "question": "Quelle est la sinistralité globale du réseau exclusif ?", "answer_gold": "71%"}
+{"qid": "q010", "doc_id": "DocFinancier", "question": "Quel est le total Auto (Mono+Flotte) à fin novembre 2024 (tous réseaux) ?", "answer_gold": "1 606 MMAD"}

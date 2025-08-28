@@ -8,6 +8,7 @@ import gc
 import re
 
 # VLM pipeline (sélection d’images + Qwen-VL)
+#from pipeline.multimodal.image_qa_pipeline_quantized import multimodal_image_qa_pipeline
 from pipeline.multimodal.image_qa_pipeline_quantized import multimodal_image_qa_pipeline
 
 # ----------------------------

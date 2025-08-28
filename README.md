@@ -1,42 +1,43 @@
-Here’s a polished `README.md` you can drop in. It’s comprehensive, in French, and includes a **graph of the project structure** (Mermaid), plus an **architecture** diagram. I’ve removed Troubleshooting, Contribution, and Roadmap sections as requested.
-
----
-
 # 📄 QwenPDF Insight — Multimodal RAG Pipeline
 
-QwenPDF Insight est un pipeline **RAG (Retrieval-Augmented Generation)** multimodal pour analyser des **PDF non structurés** (texte, tableaux, graphiques, schémas) et répondre à des questions en **langage naturel**.
-Il combine **Docling** (extraction), **Qwen3** (embeddings + génération texte), **CLIP** (sélection d’images), et **Qwen-VL** (raisonnement visuel) avec **cache** persistant et **UI Gradio**.
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+![Status](https://img.shields.io/badge/Stage-ATLANTASANAD-orange)
+
+**QwenPDF Insight** est un pipeline **RAG (Retrieval-Augmented Generation)** multimodal pour analyser des **PDF non structurés** (texte, tableaux, graphiques, schémas) et répondre à des questions en **langage naturel**, avec UI Gradio et mécanismes de **cache**.
+
+Il combine **Docling** (extraction), **Qwen3** (embeddings + génération), **CLIP** (sélection d’images), et **Qwen-VL** (raisonnement visuel). Tout le traitement est **local** par défaut.
 
 ---
 
 ## ✨ Fonctionnalités
 
-* **Extraction PDF robuste** : texte, tableaux, images, plus **rendu de pages** (utile pour graphiques vectoriels).
-* **Chunking intelligent** : préserve l’intégrité des **tableaux** et **descriptions d’images**.
-* **Recherche sémantique** : Qwen3-Embedding + NearestNeighbors + *cross-encoder* pour améliorer la précision.
-* **Vision-LLM** : Qwen2.5-VL-3B en 4-bit avec **fallback GPU/CPU automatique** quand la VRAM est limitée.
-* **Sélection d’images Zero-Shot** : CLIP (LAION) pour détecter *chart/table/diagram/flowchart*.
-* **UI Gradio unifiée** : interface simple, zones **scrollables**, affichage du **Résumé VLM** en mode ++.
-* **Caches séparés par mode** et **nettoyage auto des images** pour `text-image++`.
+- **Extraction PDF robuste** → Markdown (texte + tableaux + *captions d’images*).
+- **Chunking intelligent** conservant tables & légendes.
+- **Recherche sémantique** (embeddings Qwen3 + FAISS/KNN + *rerank* cross-encoder).
+- **Vision-LLM** (Qwen-VL quantisé 4-bit, fallback GPU/CPU).
+- **Sélection d’images zero-shot** (CLIP) : `chart / table / diagram / flowchart`.
+- **UI Gradio unifiée** avec logs, diagnostic JSON et export Markdown.
+- **Caches** séparés par mode + nettoyage auto des images temporaires.
 
 ---
 
-## 🧱 Architecture fonctionnelle
+## 🧱 Architecture (vue fonctionnelle)
 
 ```mermaid
 flowchart TD
-    A[PDF] --> B[Docling\nTexte + Tables + (Captions)]
-    B --> C[Chunking\npréservant tables & captions]
-    C --> D[Qwen3-Embedding]
-    D --> E[NearestNeighbors + CrossEncoder]
-    E --> F[Passages top-k]
-    A --> G[Extraction d’images &/ou Rendu de pages]
-    G --> H[CLIP Zero-shot Scoring]
+    A[PDF] --> B[Docling\nTexte + Tables + Captions]
+    B --> C[Chunking]
+    C --> D[Embeddings Qwen3]
+    D --> E[Retrieval (KNN/FAISS)\n+ Rerank CrossEncoder]
+    E --> F[Top-k passages]
+    A --> G[Extraction figures / rendu page]
+    G --> H[CLIP Zero-shot]
     H --> I[Top-k images pertinentes]
-    I --> J[Qwen2.5-VL 4-bit\n(fallback GPU/CPU)]
-    F --> K[Fusion Texte + Visuel]
+    I --> J[Qwen-VL 4-bit\n(fallback GPU/CPU)]
+    F --> K[Fusion Texte ⊕ Visuel]
     J --> K
-    K --> L[Réponse finale]
+    K --> L[Réponse finale + Export MD]
 ```
 
 ---
@@ -62,7 +63,7 @@ graph TD
   A --> D[scripts]
   D --> D1[launch_gradio.py]
   D --> D2[launch_gradio_img.py]
-  D --> D3[launch_gradio_unified.py]
+  D --> D3[launch_unified.py]
   A --> E[data]
   E --> E1[uploads/]
   E --> E2[markdown/]
@@ -75,34 +76,31 @@ graph TD
 
 ---
 
-## 📁 Organisation du dépôt
+## 📁 Organisation
 
 ```
 qwenpdf_insight/
-├── app/
-│   └── qwen_interface_unified.py       # UI Gradio (modes + résumé VLM, logs)
+├── app/                       # Interface Gradio unifiée
+│   └── qwen_interface_unified.py
 ├── pipeline/
-│   ├── cache_manager.py                # Cache SHA256 (chunks, embeddings, index reconstruit)
+│   ├── cache_manager.py
 │   ├── extract/
-│   │   ├── extract_with_docling.py     # Docling (texte + tableaux)
-│   │   └── extract_with_docling_img.py # Docling (texte + tableaux + captions images)
-│   ├── embedding/
-│   │   └── qwen_embedding.py           # Qwen3 Embeddings + retrieval + rerank cross-encoder
-│   ├── generation/
-│   │   └── generate_qwen_answer.py     # Génération smart (texte & multimodal, retour VLM)
-│   └── multimodal/
-│       └── image_qa_pipeline.py        # CLIP + Qwen-VL (4-bit + fallback offload)
+│   │   ├── extract_with_docling.py
+│   │   └── extract_with_docling_img.py
+│   ├── embedding/qwen_embedding.py
+│   ├── generation/generate_qwen_answer.py
+│   └── multimodal/image_qa_pipeline.py
 ├── scripts/
-│   ├── launch_gradio.py                # legacy (texte)
-│   ├── launch_gradio_img.py            # legacy (texte + images)
-│   └── launch_gradio_unified.py        # optionnel, lance l’UI unifiée
+│   ├── launch_gradio.py
+│   ├── launch_gradio_img.py
+│   └── launch_unified.py         # ← script de lancement recommandé
 ├── data/
-│   ├── uploads/    # PDF uploadés (hash)
-│   ├── markdown/   # Exports Docling (.md)
+│   ├── uploads/    # PDF (hashés)
+│   ├── markdown/   # Exports Docling
 │   ├── chunks/     # Chunks concaténés
 │   ├── cache/      # cache (text-only)
 │   ├── cache_img/  # cache (text-image & ++)
-│   ├── images/     # images extraites/rendu (temp)
+│   ├── images/     # figures/rendu (temp)
 │   └── logs/       # interface_log.txt
 ├── requirements.txt
 ├── LICENSE
@@ -111,137 +109,124 @@ qwenpdf_insight/
 
 ---
 
-## ⚙️ Installation
+## ✅ Prérequis
 
-1. Cloner et se placer dans le dossier :
+- **OS** : Linux, macOS, Windows 10/11
+- **Python** : 3.10+
+- **GPU (optionnel)** : CUDA 11.8+ recommandé pour Qwen-VL 4-bit
+- **Disk** : prévoir de l’espace pour `data/` (exports, caches, images)
+
+---
+
+## ⚙️ Installation
 
 ```bash
 git clone https://github.com/kratosra/qwenpdf_insight.git
 cd qwenpdf_insight
-```
-
-2. Créer un venv (recommandé) et installer :
-
-```bash
+python -m venv .venv && source .venv/bin/activate     # PowerShell: .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
-3. Se connecter à Hugging Face si nécessaire :
+Connexion Hugging Face si besoin :
 
 ```bash
 huggingface-cli login
 ```
 
-4. Modèles requis :
+### Modèles utilisés
 
-* `Qwen/Qwen3-Embedding-0.6B`
-* `Qwen/Qwen3-0.6B` (ou `Qwen/Qwen3-0.6B-Chat`)
-* `cross-encoder/ms-marco-MiniLM-L-6-v2`
-* `laion/CLIP-ViT-B-32-laion2B-s34B-b79K`
-* `Qwen/Qwen2.5-VL-3B-Instruct`
+- `Qwen/Qwen3-Embedding-0.6B`
+- `Qwen/Qwen3-0.6B` (ou `Qwen/Qwen3-0.6B-Chat`)
+- `cross-encoder/ms-marco-MiniLM-L-6-v2`
+- `laion/CLIP-ViT-B-32-laion2B-s34B-b79K`
+- `Qwen/Qwen2.5-VL-3B-Instruct`
 
 ---
 
-## ▶ Lancement (UI Gradio unifiée)
+## ▶ Lancement
+
+### Windows (PowerShell / CMD)
 
 ```bash
-python app/qwen_interface_unified.py
+py .\scripts\launch_unified.py
 ```
 
-* **Entrées** : PDF, question, mode (`text-only`, `text-image-with-docling`, `text-image++`).
-* **Sorties** :
-
-  * Réponse générée
-  * Passages extraits (*top-k*)
-  * **Résumé VLM** (uniquement en `text-image++`) : description Qwen-VL + images retenues + labels CLIP
-  * Diagnostic JSON + bouton pour télécharger le log
-
-> Les zones de texte sont **scrollables** pour faciliter la lecture de longues réponses.
-
-**Legacy (optionnel)**
+### Linux / macOS
 
 ```bash
-python scripts/launch_gradio.py          # version texte
-python scripts/launch_gradio_img.py      # version texte + images (ancienne UI)
+python scripts/launch_unified.py
 ```
 
----
+**Modes** (sélection dans l’UI) :
+- `text-only` — plus rapide, 100% textuel.
+- `text-image-with-docling` — ajoute *captions* d’images (sans VLM).
+- `text-image++` — multimodal complet (extraction figures → CLIP → Qwen-VL).
 
-## 🧩 Modes & Caching
-
-| Mode                      | Extraction Docling                     | Cache embeddings | Dossier cache    | VLM Qwen-VL       | Images persistées        |
-| ------------------------- | -------------------------------------- | ---------------- | ---------------- | ----------------- | ------------------------ |
-| `text-only`               | Texte + tableaux                       | ✅                | `data/cache`     | ❌                 | —                        |
-| `text-image-with-docling` | Texte + tableaux + **captions images** | ✅                | `data/cache_img` | Auto (si requise) | `data/images/<hash>`     |
-| `text-image++`            | Idem ci-dessus + **force VLM**         | ✅ (texte)        | `data/cache_img` | ✅ (forcée)        | **Non** (nettoyage auto) |
-
-* La **clé de cache** est le **hash SHA256** du PDF (géré par `EmbeddingCacheManager`).
-* L’index est **reconstruit** à partir des embeddings lorsqu’on recharge le cache.
+**Sorties UI** : réponse générée, passages *Top-k*, résumé VLM (mode ++), galerie d’images, log téléchargeable, export **Markdown**.
 
 ---
 
-## 🔧 Paramètres “sûrs” (n’affectent pas le cache)
+## 🔧 Paramètres utiles (sans casser le cache)
 
-Ces valeurs par défaut sont fixées dans `app/qwen_interface_unified.py` (et/ou peuvent être ré-exposées dans la UI sans invalider le cache) :
+- `k_images = 4` — nb d’images passées à Qwen-VL  
+- `min_prob = 0.18` — seuil CLIP  
+- `page_dpi = 180` — rendu de pages (vectoriels)  
+- `extract_full_pages = false` — rendu page entière si besoin  
 
-* `k_images = 4` — nombre d’images envoyées à Qwen-VL
-* `min_prob = 0.18` — seuil CLIP pour filtrer les images
-* `page_dpi = 180` — DPI pour rendu de pages (vectoriels)
-* `extract_full_pages = False` — activer le rendu bitmap si besoin
-
-### Variables d’environnement
+**Env conseillés**
 
 ```bash
-# logs terminal (DEBUG / INFO / WARNING / ERROR)
-export LOGLEVEL=DEBUG
-
-# limiter la fragmentation CUDA (utile sur petites VRAM)
+# logs console (DEBUG/INFO/WARNING/ERROR)
+export LOGLEVEL=INFO
+# limiter la fragmentation CUDA
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 ```
 
 ---
 
-## 🧠 Détails techniques clés
+## 🧩 Caching & perfs
 
-### 1) Extraction & Chunking
+| Mode                      | Extraction Docling                     | Cache embeddings | Dossier cache    | VLM Qwen-VL       | Images persistées        |
+|---------------------------|----------------------------------------|------------------|------------------|-------------------|--------------------------|
+| `text-only`               | Texte + tableaux                       | ✅                | `data/cache`     | ❌                 | —                        |
+| `text-image-with-docling` | Texte + tableaux + *captions*          | ✅                | `data/cache_img` | Auto (si requise) | `data/images/<hash>`     |
+| `text-image++`            | Idem + **force VLM**                   | ✅ (texte)        | `data/cache_img` | ✅ (forcée)        | Non (nettoyage auto)     |
 
-* **Docling** génère un **Markdown** propre.
-* Les **tables** et **captions d’images** sont **préservées** dans un même chunk.
-* Fenêtre glissante pour garder du contexte entre chunks.
-
-### 2) Recherche sémantique
-
-* **Embeddings** : `Qwen/Qwen3-Embedding-0.6B`.
-* **Index** : `NearestNeighbors` (brute) + **CrossEncoder** pour *reranking*.
-* **Top-k** passages → passés au générateur texte.
-
-### 3) Vision-LLM robuste
-
-* **Filtrage des images** avant VLM via `_is_valid_for_vlm()` :
-
-  * dimensions minimales,
-  * **ratio** max strict (*< 200*) pour éviter l’erreur *absolute aspect ratio must be smaller than 200*.
-* **Fallback** : rendu de pages si aucune image valide (très utile pour graphes vectoriels).
-* **Quantization 4-bit (bitsandbytes)** + **fallback automatique** `device_map="auto"` et offload CPU si VRAM faible.
+**Clé de cache** : hash **SHA-256** du PDF (géré par `EmbeddingCacheManager`). L’index est **reconstruit** à la volée depuis les embeddings.
 
 ---
 
-## 🔐 Données & Sécurité
+## 🔐 Données & sécurité
 
-* Tout le traitement est **local** (pas d’envoi cloud non configuré).
-* Le dossier `data/` est prévu pour rester **hors versionnement** (ajoutez-le dans `.gitignore`).
-* Les PDFs uploadés sont renommés par **hash** dans `data/uploads/`.
+- Traitement **local** par défaut (pas d’envoi cloud non configuré).  
+- Les PDFs sont renommés par hash dans `data/uploads/`.  
+- Pensez à ignorer `data/` dans Git :
+
+```gitignore
+data/
+*.log
+*.cache
+```
+
+---
+
+## 📸 Exemple d’utilisation (placeholders)
+
+Place tes captures d’écran dans `docs/screenshots/` :
+
+- `docs/screenshots/ui_upload.png` — Upload + choix du mode  
+- `docs/screenshots/ui_response.png` — Réponse + top-k + résumé VLM  
 
 ---
 
 ## 👤 Auteur
 
-**Ahmed Amine Jadi** — 2025
+**Ahmed Amine Jadi** — 2025  
 Stage ingénieur — *AtlantaSanad Assurance*
 
-* GitHub : [https://github.com/kratosra](https://github.com/kratosra)
-* LinkedIn : [https://www.linkedin.com/in/ahmed-amine-jadi-958010373/](https://www.linkedin.com/in/ahmed-amine-jadi-958010373/)
-* Email : [amine\_jadon@outlook.fr](mailto:amine_jadon@outlook.fr)
+- GitHub : https://github.com/kratosra  
+- LinkedIn : https://www.linkedin.com/in/ahmed-amine-jadi-958010373/  
+- Email : amine_jadon@outlook.fr
 
 ---
 
