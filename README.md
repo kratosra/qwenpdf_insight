@@ -24,23 +24,7 @@ Il combine **Docling** (extraction), **Qwen3** (embeddings + génération), **CL
 
 ## 🧱 Architecture (vue fonctionnelle)
 
-```mermaid
-flowchart TD
-    A[PDF] --> B[Docling\nTexte + Tables + Captions]
-    B --> C[Chunking]
-    C --> D[Embeddings Qwen3]
-    D --> E[Retrieval (KNN/FAISS)\n+ Rerank CrossEncoder]
-    E --> F[Top-k passages]
-    A --> G[Extraction figures / rendu page]
-    G --> H[CLIP Zero-shot]
-    H --> I[Top-k images pertinentes]
-    I --> J[Qwen-VL 4-bit\n(fallback GPU/CPU)]
-    F --> K[Fusion Texte ⊕ Visuel]
-    J --> K
-    K --> L[Réponse finale + Export MD]
-```
-
----
+![Architecture du pipeline](docs/Capture d'écran 2025-08-28 174856.png)
 
 ## 🗂️ Graphe de structure du projet
 
